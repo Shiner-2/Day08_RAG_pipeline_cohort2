@@ -26,6 +26,7 @@ load_dotenv()
 
 PAGEINDEX_API_KEY = os.getenv("PAGEINDEX_API_KEY", "")
 STANDARDIZED_DIR = Path(__file__).parent.parent / "data" / "standardized"
+LEGAL_SCORE_BOOST = 1.35
 
 
 def upload_documents():
@@ -69,11 +70,14 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
         if not content:
             continue
         doc_tokens = _tokens(content[:5000])
+        doc_type = md_file.parent.name
         score = len(query_tokens & doc_tokens) / max(len(query_tokens), 1)
+        if doc_type == "legal":
+            score *= LEGAL_SCORE_BOOST
         scored.append({
             "content": content[:1200],
             "score": float(score),
-            "metadata": {"source": md_file.name, "type": md_file.parent.name},
+            "metadata": {"source": md_file.name, "type": doc_type},
             "source": "pageindex",
         })
 

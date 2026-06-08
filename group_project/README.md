@@ -193,11 +193,19 @@ run_dashboard()
 # Cài đặt dependencies
 pip install -r requirements.txt
 
-# Chạy app
+# Chạy frontend Streamlit
 streamlit run app.py
-# hoặc
-chainlit run app.py
+
+# Chạy backend FastAPI
+uvicorn backend:app --host 127.0.0.1 --port 8000
 ```
+
+Backend endpoints chính:
+
+- `GET /health` — kiểm tra backend và trạng thái LLM key
+- `POST /chat` — gửi câu hỏi, nhận answer + citations + source documents
+- `GET /sessions/{session_id}` — xem conversation memory
+- `DELETE /sessions/{session_id}` — xóa memory của session
 
 ---
 

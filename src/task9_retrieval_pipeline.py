@@ -25,6 +25,22 @@ from .task8_pageindex_vectorless import pageindex_search
 SCORE_THRESHOLD = 0.3   # Nếu best score < threshold → fallback PageIndex
 DEFAULT_TOP_K = 5
 RERANK_METHOD = "cross_encoder"  # "cross_encoder" | "mmr" | "rrf"
+LEGAL_SCORE_BOOST = 1.35  # Ưu tiên văn bản luật hơn bài báo khi cùng mức liên quan.
+
+
+def _apply_legal_priority(results: list[dict]) -> list[dict]:
+    boosted = []
+    for item in results:
+        new_item = item.copy()
+        metadata = new_item.get("metadata", {})
+        if metadata.get("type") == "legal":
+            new_item["score"] = float(new_item.get("score", 0.0)) * LEGAL_SCORE_BOOST
+            new_item["legal_priority"] = True
+        else:
+            new_item["score"] = float(new_item.get("score", 0.0))
+            new_item["legal_priority"] = False
+        boosted.append(new_item)
+    return sorted(boosted, key=lambda x: x.get("score", 0.0), reverse=True)
 
 
 def retrieve(
@@ -72,6 +88,8 @@ def retrieve(
         final_results = rerank(query, merged, top_k=top_k, method=RERANK_METHOD)
     else:
         final_results = merged[:top_k]
+
+    final_results = _apply_legal_priority(final_results)
 
     for item in final_results:
         item["source"] = "hybrid"

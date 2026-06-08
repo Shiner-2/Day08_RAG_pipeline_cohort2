@@ -10,11 +10,14 @@ Hướng dẫn:
 """
 
 import os
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from .task9_retrieval_pipeline import retrieve
+
+logger = logging.getLogger("rag.generation")
 
 
 # =============================================================================
@@ -32,6 +35,34 @@ TOP_P = 0.9
 # temperature: Độ ngẫu nhiên của output
 # Chọn 0.3 vì: RAG cần factual, ít sáng tạo
 TEMPERATURE = 0.3
+
+
+def _llm_config() -> dict:
+    """Build OpenAI-compatible client config without exposing secrets."""
+    nvidia_key = os.getenv("NVIDIA_API_KEY", "")
+    openai_key = os.getenv("OPENAI_API_KEY", "")
+    api_key = nvidia_key or openai_key
+    base_url = os.getenv("OPENAI_BASE_URL", "")
+
+    if nvidia_key or (openai_key.startswith("nvapi-") and not base_url):
+        return {
+            "api_key": api_key,
+            "base_url": os.getenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"),
+            "model": os.getenv("NVIDIA_MODEL", "meta/llama-3.1-8b-instruct"),
+            "provider": "nvidia",
+        }
+
+    return {
+        "api_key": api_key,
+        "base_url": base_url or None,
+        "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+        "provider": "openai",
+    }
+
+
+def llm_is_configured() -> bool:
+    """Return True when an OpenAI-compatible API key is available."""
+    return bool(_llm_config()["api_key"])
 
 
 # =============================================================================
@@ -115,7 +146,7 @@ def format_context(chunks: list[dict]) -> str:
 # GENERATION
 # =============================================================================
 
-def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
+def generate_with_citation(query: str, top_k: int = TOP_K, use_llm: bool | None = None) -> dict:
     """
     End-to-end RAG generation có citation.
 
@@ -137,8 +168,14 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
             'retrieval_source': str  # 'hybrid' hoặc 'pageindex'
         }
     """
+    logger.info("Retrieving context top_k=%s", top_k)
     chunks = retrieve(query, top_k=top_k)
     reordered = reorder_for_llm(chunks)
+    logger.info(
+        "Retrieved chunks=%s retrieval_source=%s",
+        len(chunks),
+        chunks[0].get("source", "none") if chunks else "none",
+    )
 
     if not reordered:
         return {
@@ -146,6 +183,52 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
             "sources": [],
             "retrieval_source": "none",
         }
+
+    context = format_context(reordered)
+
+    if use_llm is None:
+        use_llm = os.getenv("RAG_USE_LLM", "").lower() in {"1", "true", "yes"}
+    if use_llm and llm_is_configured():
+        config = _llm_config()
+        logger.info(
+            "Calling LLM provider=%s model=%s base_url=%s",
+            config["provider"],
+            config["model"],
+            config["base_url"] or "default",
+        )
+        try:
+            from openai import OpenAI
+
+            client_kwargs = {"api_key": config["api_key"]}
+            if config["base_url"]:
+                client_kwargs["base_url"] = config["base_url"]
+            client = OpenAI(**client_kwargs)
+            user_message = f"Context:\n{context}\n\n---\n\nQuestion: {query}"
+            response = client.chat.completions.create(
+                model=config["model"],
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                temperature=TEMPERATURE,
+                top_p=TOP_P,
+                max_tokens=700,
+            )
+            answer = response.choices[0].message.content or ""
+            logger.info("LLM response ok provider=%s chars=%s", config["provider"], len(answer))
+            return {
+                "answer": answer.strip() or "Tôi không thể xác minh thông tin này từ nguồn hiện có.",
+                "sources": chunks,
+                "context": context,
+                "retrieval_source": chunks[0].get("source", "hybrid") if chunks else "none",
+                "generation_mode": f"llm:{config['provider']}",
+            }
+        except Exception as exc:
+            llm_error = str(exc)
+            logger.exception("LLM call failed; falling back to local answer")
+    else:
+        llm_error = ""
+        logger.info("Using local generation use_llm=%s configured=%s", use_llm, llm_is_configured())
 
     source_names = []
     evidence_lines = []
@@ -167,8 +250,10 @@ def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
     return {
         "answer": answer,
         "sources": chunks,
-        "context": format_context(reordered),
+        "context": context,
         "retrieval_source": chunks[0].get("source", "hybrid") if chunks else "none",
+        "generation_mode": "local",
+        "llm_error": llm_error,
     }
 
 
