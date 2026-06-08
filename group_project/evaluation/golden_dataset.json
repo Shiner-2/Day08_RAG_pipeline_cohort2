@@ -1,17 +1,107 @@
 [
   {
-    "question": "Hình phạt cho tội tàng trữ trái phép chất ma tuý theo Điều 249 Bộ luật Hình sự?",
-    "expected_answer": "Phạt tù từ 1 đến 5 năm đối với trường hợp tàng trữ từ 1g đến dưới 5g heroin hoặc cocaine, hoặc chất ma tuý khác với khối lượng tương đương.",
-    "expected_context": "Bộ luật Hình sự 2015, Điều 249"
+    "id": "legal_001",
+    "question": "Luật Phòng, chống ma túy 2021 quy định những hình thức cai nghiện nào?",
+    "expected_answer": "Các hình thức gồm cai nghiện tự nguyện tại gia đình, cộng đồng, cơ sở cai nghiện và cai nghiện bắt buộc tại cơ sở cai nghiện.",
+    "expected_context": "luat-phong-chong-ma-tuy-2021.md",
+    "category": "legal"
   },
   {
-    "question": "Luật Phòng chống ma tuý 2021 quy định những hình thức cai nghiện nào?",
-    "expected_answer": "Cai nghiện tự nguyện tại gia đình, cai nghiện tự nguyện tại cộng đồng, cai nghiện tự nguyện tại cơ sở cai nghiện, và cai nghiện bắt buộc tại cơ sở cai nghiện.",
-    "expected_context": "Luật Phòng chống ma tuý 2021, Chương V"
+    "id": "legal_002",
+    "question": "Tội tàng trữ trái phép chất ma túy được quy định trong văn bản nào?",
+    "expected_answer": "Tội tàng trữ trái phép chất ma túy thuộc Bộ luật Hình sự 2015, Chương các tội phạm về ma túy.",
+    "expected_context": "bo-luat-hinh-su-2015-phan-1.md",
+    "category": "legal"
   },
   {
-    "question": "Danh mục các chất ma tuý thuộc nhóm I theo quy định pháp luật Việt Nam gồm những chất nào?",
-    "expected_answer": "Nhóm I gồm các chất ma tuý tuyệt đối cấm sử dụng trong y học và đời sống, bao gồm heroin, cocaine, methamphetamine, MDMA (ecstasy), cannabis (cần sa), và các chất tương tự.",
-    "expected_context": "Nghị định 57/2022/NĐ-CP, Phụ lục I"
+    "id": "legal_003",
+    "question": "Văn bản nào hướng dẫn thi hành một số điều của Luật Phòng, chống ma túy?",
+    "expected_answer": "Nghị định 105/2021/NĐ-CP quy định chi tiết và hướng dẫn thi hành một số điều của Luật Phòng, chống ma túy.",
+    "expected_context": "nghi-dinh-105-2021.md",
+    "category": "legal"
+  },
+  {
+    "id": "legal_004",
+    "question": "Nghị định nào quy định danh mục chất ma túy và tiền chất?",
+    "expected_answer": "Nghị định 57/2022/NĐ-CP quy định các danh mục chất ma túy và tiền chất.",
+    "expected_context": "nghi-dinh-57-2022.md",
+    "category": "legal"
+  },
+  {
+    "id": "legal_005",
+    "question": "Luật Phòng, chống ma túy 2021 tập trung vào các nhóm nội dung nào?",
+    "expected_answer": "Luật tập trung vào phòng ngừa, kiểm soát hoạt động hợp pháp liên quan đến ma túy, cai nghiện, quản lý sau cai và trách nhiệm của cơ quan, tổ chức, cá nhân.",
+    "expected_context": "luat-phong-chong-ma-tuy-2021.md",
+    "category": "legal"
+  },
+  {
+    "id": "legal_006",
+    "question": "Bộ luật Hình sự 2015 xử lý nhóm hành vi nào liên quan đến ma túy?",
+    "expected_answer": "Bộ luật Hình sự xử lý các hành vi phạm tội về ma túy như sản xuất, mua bán, vận chuyển, tàng trữ và tổ chức sử dụng trái phép chất ma túy.",
+    "expected_context": "bo-luat-hinh-su-2015-phan-1.md",
+    "category": "legal"
+  },
+  {
+    "id": "legal_007",
+    "question": "Văn bản hợp nhất 08/VBHN-BCA liên quan tới nội dung gì?",
+    "expected_answer": "Văn bản hợp nhất 08/VBHN-BCA liên quan đến danh mục chất ma túy và tiền chất.",
+    "expected_context": "vbhn-danh-muc-chat-ma-tuy-tien-chat-2020.md",
+    "category": "legal"
+  },
+  {
+    "id": "legal_008",
+    "question": "Khi hỏi về căn cứ pháp luật phòng chống ma túy, tài liệu nào nên được ưu tiên?",
+    "expected_answer": "Nên ưu tiên văn bản pháp luật gốc như Luật Phòng, chống ma túy 2021, Bộ luật Hình sự 2015 và các nghị định hướng dẫn.",
+    "expected_context": "luat-phong-chong-ma-tuy-2021.md",
+    "category": "legal"
+  },
+  {
+    "id": "news_001",
+    "question": "Bài báo Thanh Niên nào nhắc tới Chi Dân, An Tây và Trúc Phương liên quan ma túy?",
+    "expected_answer": "Bài Thanh Niên về việc bắt ca sĩ Chi Dân, người mẫu An Tây và Nguyễn Đỗ Trúc Phương liên quan ma túy.",
+    "expected_context": "01-chi-dan-an-tay-truc-phuong-thanh-nien.md",
+    "category": "news"
+  },
+  {
+    "id": "news_002",
+    "question": "Bài Dân Trí trong dữ liệu nói về việc truy tố những ai?",
+    "expected_answer": "Bài Dân Trí nói về việc truy tố ca sĩ Chi Dân và người mẫu An Tây.",
+    "expected_context": "02-truy-to-chi-dan-an-tay-dan-tri.md",
+    "category": "news"
+  },
+  {
+    "id": "news_003",
+    "question": "Bài VnExpress nào trong dữ liệu nói về diễn viên Hữu Tín?",
+    "expected_answer": "Bài VnExpress về diễn viên hài bị tạm giữ vì liên quan ma túy nói về Hữu Tín.",
+    "expected_context": "03-huu-tin-bi-tam-giu-vnexpress.md",
+    "category": "news"
+  },
+  {
+    "id": "news_004",
+    "question": "Bài VnExpress nào nhắc tới Châu Việt Cường?",
+    "expected_answer": "Bài VnExpress về đêm sử dụng ma túy của ca sĩ Châu Việt Cường.",
+    "expected_context": "04-chau-viet-cuong-vnexpress.md",
+    "category": "news"
+  },
+  {
+    "id": "news_005",
+    "question": "Bài VietnamNet trong dữ liệu tổng hợp chủ đề gì?",
+    "expected_answer": "Bài VietnamNet tổng hợp Hữu Tín và các sao Việt nổi tiếng dính vào ma túy.",
+    "expected_context": "05-sao-viet-ten-tin-dinh-ma-tuy-vietnamnet.md",
+    "category": "news"
+  },
+  {
+    "id": "mixed_001",
+    "question": "Khi người nổi tiếng liên quan ma túy, nên dùng nguồn nào để trả lời phần pháp lý và phần sự kiện?",
+    "expected_answer": "Phần pháp lý nên dựa vào văn bản luật, còn phần sự kiện nên dựa vào bài báo đã crawl.",
+    "expected_context": "luat-phong-chong-ma-tuy-2021.md",
+    "category": "mixed"
+  },
+  {
+    "id": "mixed_002",
+    "question": "Nếu câu hỏi vừa hỏi về nghệ sĩ vừa hỏi về chế tài ma túy, pipeline cần lấy loại tài liệu nào?",
+    "expected_answer": "Pipeline cần lấy cả bài báo liên quan nghệ sĩ và văn bản pháp luật về chế tài, trong đó tài liệu luật nên được ưu tiên cho kết luận pháp lý.",
+    "expected_context": "bo-luat-hinh-su-2015-phan-1.md",
+    "category": "mixed"
   }
 ]

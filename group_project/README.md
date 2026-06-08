@@ -151,10 +151,10 @@ run_dashboard()
 
 ### Deliverable Evaluation
 
-- [ ] File `group_project/evaluation/golden_dataset.json` — 15+ cặp Q&A
-- [ ] File `group_project/evaluation/eval_pipeline.py` — script chạy evaluation
-- [ ] File `group_project/evaluation/results.md` — bảng điểm + phân tích
-- [ ] So sánh A/B ít nhất 2 configs
+- [x] File `group_project/evaluation/golden_dataset.json` — 15+ cặp Q&A
+- [x] File `group_project/evaluation/eval_pipeline.py` — script chạy evaluation
+- [x] File `group_project/evaluation/results.md` — bảng điểm + phân tích
+- [x] So sánh A/B ít nhất 2 configs
 
 ---
 
@@ -171,8 +171,36 @@ run_dashboard()
 ## Kiến Trúc Hệ Thống
 
 ```
-[Vẽ diagram kiến trúc ở đây]
+Browser
+  |
+  |  GET /
+  v
+FastAPI backend.py
+  |-- serves single-file frontend: frontend/index.html
+  |-- POST /chat
+  |-- GET /health
+  |-- GET/DELETE /sessions/{session_id}
+  |
+  v
+Retrieval Pipeline (Task 9)
+  |-- Semantic search (Task 5, TF-IDF cosine)
+  |-- Lexical search (Task 6, BM25 local)
+  |-- RRF merge + rerank (Task 7)
+  |-- Legal document score boost
+  |-- PageIndex-style fallback (Task 8)
+  |
+  v
+Generation (Task 10)
+  |-- Context reordering
+  |-- Citation/source formatting
+  |-- Optional LLM call through OpenAI-compatible NVIDIA endpoint
+  |-- Local fallback if API fails
+  |
+  v
+Response = answer + sources + retrieval metadata
 ```
+
+Frontend hiện tại là HTML/CSS/JS thuần, không dùng Streamlit static bundle. Giao diện chia màn hình 75% chat và 25% tài liệu liên quan; source panel sticky bên phải, follow-up suggestions nằm cuối từng câu trả lời.
 
 ---
 
@@ -180,10 +208,12 @@ run_dashboard()
 
 | Thành viên | MSSV | Nhiệm vụ | Trạng thái |
 |-----------|------|----------|------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Lê Quang Thọ | 2A202600597 | Thu thập/kiểm tra dữ liệu pháp luật, chuẩn hóa nguồn legal | Done |
+| Phạm Mai Anh | 2A202600644 | Thu thập bài báo, kiểm tra metadata news và source documents | Done |
+| Đỗ Trung Đức | 2A202600918 | Chunking, indexing, semantic search và lexical search | Done |
+| Phạm Ngọc Hải Dương | 2A202600629 | Backend FastAPI, frontend chatbot, tích hợp generation có citation | Done |
+| Vương Nguyệt Bình | 2A202600932 | Evaluation pipeline, golden dataset, A/B comparison | Done |
+| Nguyễn Văn Sáng | 2A202600598 | QA demo, kiểm thử end-to-end, README và báo cáo kết quả | Done |
 
 ---
 
@@ -193,11 +223,29 @@ run_dashboard()
 # Cài đặt dependencies
 pip install -r requirements.txt
 
-# Chạy frontend Streamlit
-streamlit run app.py
+# Chạy toàn bộ app (backend + frontend cùng FastAPI)
+./start.bat
 
-# Chạy backend FastAPI
+# Hoặc chạy thủ công
 uvicorn backend:app --host 127.0.0.1 --port 8000
+```
+
+Mở trình duyệt tại:
+
+```text
+http://127.0.0.1:8000
+```
+
+Chạy evaluation:
+
+```bash
+python group_project/evaluation/eval_pipeline.py
+```
+
+Output evaluation:
+
+```text
+group_project/evaluation/results.md
 ```
 
 Backend endpoints chính:
