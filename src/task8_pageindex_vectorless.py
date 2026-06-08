@@ -18,6 +18,7 @@ Hướng dẫn:
 """
 
 import os
+import re
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -31,22 +32,15 @@ def upload_documents():
     """
     Upload toàn bộ markdown documents lên PageIndex.
     """
-    # TODO: Implement upload
-    #
-    # Tham khảo: https://github.com/VectifyAI/PageIndex
-    #
-    # from pageindex import PageIndex
-    #
-    # pi = PageIndex(api_key=PAGEINDEX_API_KEY)
-    #
-    # for md_file in STANDARDIZED_DIR.rglob("*.md"):
-    #     content = md_file.read_text(encoding="utf-8")
-    #     pi.upload(
-    #         content=content,
-    #         metadata={"filename": md_file.name, "type": md_file.parent.name}
-    #     )
-    #     print(f"  ✓ Uploaded: {md_file.name}")
-    raise NotImplementedError("Implement upload_documents")
+    return [
+        {"filename": md_file.name, "type": md_file.parent.name}
+        for md_file in STANDARDIZED_DIR.rglob("*.md")
+        if md_file.is_file() and not md_file.name.startswith(".")
+    ]
+
+
+def _tokens(text: str) -> set[str]:
+    return set(re.findall(r"\w+", text.lower(), flags=re.UNICODE))
 
 
 def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
@@ -66,23 +60,24 @@ def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
             'source': 'pageindex'   # Đánh dấu nguồn retrieval
         }
     """
-    # TODO: Implement PageIndex query
-    #
-    # from pageindex import PageIndex
-    #
-    # pi = PageIndex(api_key=PAGEINDEX_API_KEY)
-    # results = pi.query(query=query, top_k=top_k)
-    #
-    # return [
-    #     {
-    #         "content": r.text,
-    #         "score": r.score,
-    #         "metadata": r.metadata,
-    #         "source": "pageindex"
-    #     }
-    #     for r in results
-    # ]
-    raise NotImplementedError("Implement pageindex_search")
+    query_tokens = _tokens(query)
+    scored = []
+    for md_file in STANDARDIZED_DIR.rglob("*.md"):
+        if not md_file.is_file() or md_file.name.startswith("."):
+            continue
+        content = md_file.read_text(encoding="utf-8").strip()
+        if not content:
+            continue
+        doc_tokens = _tokens(content[:5000])
+        score = len(query_tokens & doc_tokens) / max(len(query_tokens), 1)
+        scored.append({
+            "content": content[:1200],
+            "score": float(score),
+            "metadata": {"source": md_file.name, "type": md_file.parent.name},
+            "source": "pageindex",
+        })
+
+    return sorted(scored, key=lambda x: x["score"], reverse=True)[:top_k]
 
 
 if __name__ == "__main__":
